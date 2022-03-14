@@ -1,0 +1,53 @@
+<template>
+	<view class="content">
+		<z-paging ref="paging" v-model="dataList" @query="queryList">
+			<template v-for="(item,index) in dataList">
+				<cell class="phone-item">
+					<u-my-phone :item="item"></u-my-phone>
+				</cell>
+			</template>
+		</z-paging>
+	</view>
+	<u-notify ref="notify"></u-notify>
+</template>
+
+<script>
+	import {
+		http
+	} from '@/utils/request.js'
+	export default {
+		data() {
+			return {
+				dataList: [],
+			}
+		},
+		methods: {
+			queryList(pageNo, paggeSize) {
+				console.log(pageNo, paggeSize)
+				http.post('/phone', {
+					page: pageNo
+				}).then(res => {
+					if (res.data.error_code === 0) {
+						this.$refs.paging.complete(res.data.data)
+					} else {
+						this.$refs.notify.error(res.data.msg)
+						//如果请求失败，需要填充之前的数据，给予一个提示即可，catch一样处理方式
+						//TODO
+						this.$refs.paging.complete(false)
+					}
+				}).catch(err => {
+					//如果请求失败，需要填充之前的数据，给予一个提示即可，catch一样处理方式
+					//TODO
+					this.$refs.notify.error('请求失败')
+					this.$refs.padding.complete(false)
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.phone-item {
+		background-color: #d2d2d3;
+	}
+</style>

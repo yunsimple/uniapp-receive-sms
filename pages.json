@@ -1,0 +1,123 @@
+{
+	"easycom": {
+		// npm安装的方式不需要前面的"@/"，下载安装的方式需要"@/"
+		// npm安装方式
+		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [{
+			"path": "pages/phone",
+			"style": {
+				"navigationBarTitleText": "全部号码",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				//"navigationStyle": "custom" ,// 隐藏系统导航栏
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/email",
+			"style": {
+				"navigationBarTitleText": "全部号码",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				//"navigationStyle": "custom" ,// 隐藏系统导航栏
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/country",
+			"style": {
+				"navigationBarTitleText": "全部号码",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				//"navigationStyle": "custom" ,// 隐藏系统导航栏
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/message",
+			"style": {
+				"navigationBarTitleText": "全部号码",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				//"navigationStyle": "custom" ,// 隐藏系统导航栏
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/email-detail",
+			"style": {
+				"navigationBarTitleText": "邮件内容",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/phone-category",
+			"style": {
+				"navigationBarTitleText": "号码分类",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				"enablePullDownRefresh": false
+			}
+
+		},
+		{
+			"path": "pages/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle": "white", //状态栏字体颜色
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/login",
+			"style": {
+				"navigationBarTitleText": "登陆",
+				"navigationBarBackgroundColor": "#35516B",
+				"navigationBarTextStyle":"white",  //状态栏字体颜色
+				"enablePullDownRefresh": false
+			}
+
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#B6C3D2",
+		"selectedColor": "#2B2E3D",
+		"borderStyle": "black",
+		"backgroundColor": "#FFFFFF",
+		"list": [{
+				"pagePath": "pages/phone",
+				"iconPath": "static/images/menu_imgs/phone.png",
+				"selectedIconPath": "static/images/menu_imgs/phone_s.png",
+				"text": "号码"
+			},
+			{
+				"pagePath": "pages/country",
+				"iconPath": "static/images/menu_imgs/country.png",
+				"selectedIconPath": "static/images/menu_imgs/country_s.png",
+				"text": "所有国家"
+			},
+			{
+				"pagePath": "pages/email",
+				"iconPath": "static/images/menu_imgs/email.png",
+				"selectedIconPath": "static/images/menu_imgs/email_s.png",
+				"text": "隐私邮箱"
+			},
+			{
+				"pagePath": "pages/my",
+				"iconPath": "static/images/menu_imgs/my.png",
+				"selectedIconPath": "static/images/menu_imgs/my_s.png",
+				"text": "个人中心"
+			}
+		]
+	}
+}
