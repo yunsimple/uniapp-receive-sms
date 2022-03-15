@@ -17,12 +17,34 @@
 		data() {
 			return {
 				dataList: [],
+				type: 'countryList',
+				country_id: null,
 			}
+		},
+		onLoad(e) {
+			console.log('phone-category接收数据')
+			console.log(e)
+			let type = e.type
+			let navTitle
+			if(type == 'countryList'){
+				this.country_id = e.id
+				navTitle = e.country + '号码'
+			}else{
+				//type=level 差别显示，有权限才可以查看
+				console.log(e)
+				this.urlValue = e
+				navTitle = '号码'
+			}
+			this.type = type
+			uni.setNavigationBarTitle({
+				title: navTitle
+			})
 		},
 		methods: {
 			queryList(pageNo, pageSize) {
 				console.log(pageNo, pageSize)
 				http.post('/phone', {
+					country_id: this.country_id,
 					page: pageNo
 				}).then(res => {
 					if (res.data.error_code === 0) {

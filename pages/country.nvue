@@ -1,0 +1,110 @@
+<template>
+	<view>
+		<z-paging class="content" ref="paging" v-model="dataList" @query="queryList">
+			<cell class="country-list">
+				<view style="margin-top: 30rpx;" v-for="(item,index) in dataList" class="country-list-image" :data-id="item.id" :data-country="item.title" @click="click">
+					<image :src="imageUrl(item.bh)" style="height: 200rpx;" mode="heightFix"></image>
+					<text class="country-list-title-text">{{item.title}}</text>
+				</view>
+			</cell>
+		</z-paging>
+		<u-notify ref="notify"></u-notify>
+	</view>
+</template>
+<script>
+	import {
+		http
+	} from '@/utils/request.js'
+	import { appParams } from '@/utils/config.js'
+	var page
+	export default {
+		data() {
+			return {
+				title: '所有国家',
+				subtitle: uni.getStorageSync('app_params').subtitle,
+				dataList: []
+			}
+		},
+		methods: {
+			//生成国旗图片方法
+			imageUrl: function(bh) {
+				return '../static/images/guoqi/list/' + bh + '.png'
+			},
+			//根据页数获取数据
+			queryList(pageNo) {
+				http.post('/country', {
+					page: pageNo
+				}, {
+					custom: {
+						//auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code !== 0) {
+						this.$refs.notify.error(res.data.msg)
+						this.$refs.paging.complete(uni.getStorageSync('countryCacheData'));
+						return
+					}
+					var listData = res.data.data
+					console.log(listData)
+					if (page == 1) {
+						//缓存首页数据
+						uni.setStorage({
+							key: 'countryCacheData',
+							data: listData,
+							success() {
+								console.log('缓存成功')
+							}
+						})
+					}
+					this.$refs.paging.complete(listData);
+					page++
+				}).catch(err => {
+					//获取失败
+					this.$refs.notify.error('请求失败，请稍候再试')
+					this.dataList = []
+					let countryCacheData = uni.getStorageSync('countryCacheData')
+					if(countryCacheData && uni.getStorageSync(appParams).cache){
+						this.$refs.paging.complete(countryCacheData);
+					}else{
+						this.$refs.paging.complete(false);
+					}
+					
+				})
+			},
+			click: function(e) { //点击事件
+				let id = e.target.dataset.id
+				let country = e.target.dataset.country
+				uni.navigateTo({
+					url: 'phone-category?type=countryList&id=' + id + '&country=' + country,
+					success(e) {
+						//todo
+					},
+					fail(e) {
+						console.log(e)
+						this.$refs.notify.error('跳转页面失败，请稍候再试')
+					}
+				})
+			},
+		}
+	}
+</script>
+<style>
+	.country-list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-around;
+	}
+
+	.country-list-image {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.country-list-title {}
+
+	.country-list-title-text {
+		margin-top: 8rpx;
+		font-size: 25rpx;
+		font-weight: bold;
+	}
+</style>

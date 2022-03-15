@@ -1,0 +1,221 @@
+<template>
+	<view>
+		<z-paging ref="paging" v-model="dataList" @query="queryList">
+			<cell>
+				<view class="phone">
+					<view class="phone-top" style="flex-flow:row nowrap;justify-content: center;">
+						<view class="phone-top-image">
+							<u--image :src="imageUrl(bh)" width="96rpx" height="96rpx"></u--image>
+						</view>
+						<view class="phone-top-text" style="flex-flow:row nowrap;">
+							<u--text :bold="true" size="18" @click="clickCopy(phone_num)" :text="'+' + bh"></u--text>
+							<u--text :bold="true" size="25" @click="clickCopy(phone_num)" :text=" ' ' + phone_num "></u--text>
+						</view>
+					</view>
+					<view class="phone-bottom">
+						<u-row justify="center" gutter="10">
+							<u-col span="3"><u-button throttleTime="2000" type="success" size="small" icon="phone" text="随机号码" @click="randomPhone"></u-button></u-col>
+							<u-col span="3"><u-button throttleTime="2000" type="error" size="small" icon="info-circle" text="无法接收" @click="report"></u-button></u-col>
+						</u-row>
+					</view>
+				</view>
+			</cell>
+			<cell class="content" v-for="(item,index) in dataList">
+				<view class="message" >
+					<view class="message-top">
+						<text class="message-text">{{item.smsContent}}</text>
+					</view>
+					<view class="message-bottom">
+						<view class="project" style="flex-direction: row;">
+							<view>
+								<u-icon name="email" size="32rpx" color="info" style="margin-top: 4rpx;"></u-icon>
+							</view>
+							<view>
+								<u--text type="info" size="12" v-if="item.url" :text="item.url"></u--text>
+								<u--text type="info" size="12" v-else :text="callPhone(item.smsNumber)"></u--text>
+							</view>
+						</view>
+						<view class="time" style="flex-direction: row;">
+							<u-icon name="clock" size="25rpx" color="info"></u-icon>
+							<u--text type="info" size="12" :text="lastTime(item.smsDate)"></u--text>
+						</view>
+					</view>
+				</view>
+			</cell>
+		</z-paging>
+		<u-notify ref="notify"></u-notify>
+
+	</view>
+</template>
+
+<script>
+	import {
+		http
+	} from '@/utils/request.js'
+	import clipboard from "@/js_sdk/dc-clipboard/clipboard.js"
+	import {
+		toDate,
+		lastTime
+	} from "@/utils/tools.js"
+	import {
+		appParams
+	} from '@/utils/config.js'
+	export default {
+		data() {
+			return {
+				dataList: [],
+				phone_num: null,
+				bh: null
+			}
+		},
+		onLoad(e) {
+			this.phone_num = e.phone_num
+			this.bh = e.bh
+		},
+		methods: {
+			//生成国旗图片方法
+			imageUrl: function(bh) {
+				return '../static/images/guoqi/' + bh + '.png'
+			},
+			//根据页数获取数据
+			queryList(pageNo) {
+				let phone_num = this.phone_num
+				http.post('/message', {
+					phone: this.phone_num,
+					page: pageNo
+				}, {
+					custom: {
+						//auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code !== 0) {
+						this.$refs.notify.error(res.data.msg)
+						this.$refs.paging.complete(uni.getStorageSync('messageCacheData_' + phone_num));
+						return
+					}
+					var listData = res.data.data
+
+					//缓存数据
+					uni.setStorage({
+						key: 'messageCacheData_' + phone_num,
+						data: listData,
+						success() {
+							console.log('缓存成功')
+						}
+					})
+					this.$refs.paging.complete(listData);
+				}).catch(err => {
+					//获取失败
+					this.$refs.notify.error('请求失败，请稍候再试')
+					this.dataList = []
+					let messageData = uni.getStorageSync('messageCacheData_' + phone_num)
+					if (messageData && uni.getStorageSync(appParams).cache) {
+						this.$refs.paging.complete(messageData);
+					} else {
+						this.$refs.paging.complete(false);
+					}
+				})
+			},
+			click: function(e) { //点击事件
+				let phone_num = e.target.dataset.phone_num
+				uni.navigateTo({
+					url: 'message?phone_num=' + phone_num,
+					success(e) {
+
+					},
+					fail(e) {
+						this.$refs.notify.error('跳转页面失败，请稍候再试')
+					}
+				})
+			},
+			longClickCopy: function(e) { //点击号码复制
+				e.stopPropagation(); //阻止冒泡
+				let phone_num = e.target.dataset.phone_num
+				clipboard.setText(phone_num)
+				this.$refs.notify.success('复制号码 ' + phone_num + ' 成功')
+			},
+			callPhone(phone) { //来电号码显示后五位处理
+				var leng = phone.length
+				if (leng > 5) {
+					return '*' + phone.slice(-5)
+				} else {
+					return '*' + phone.slice(-(leng - 1))
+				}
+			},
+			toDate(timestamp) { //转换时间
+				return toDate(timestamp)
+			},
+			lastTime(timeStamp) { //最后时间间隔
+				return lastTime(timeStamp)
+			},
+			clickCopy(phone_num) {
+				clipboard.setText(phone_num)
+				this.$refs.notify.success('复制号码 ' + phone_num + ' 成功')
+			},
+			randomPhone() {
+				http.post('/random', {}, {
+					custom: {
+						auth: true
+					}
+				}).then(res => {
+					console.log(res)
+					if (res.data.error_code == 0) {
+						let phone_num = res.data.data.phone_num
+						let bh = res.data.data.bh
+						console.log(phone_num)
+						uni.redirectTo({
+							url: 'message?phone_num=' + phone_num + '&bh=' + bh
+						})
+					} else {
+						this.$refs.message.open(res.data.msg, 'error')
+					}
+				}).catch(err => {
+					this.$refs.notify.error('请求失败，请稍候再试')
+				})
+			},
+			report() {
+				http.post('/report', {
+					'phone_num': this.phone_num
+				}, {
+					custom: {
+						auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code === 0) {
+						this.$refs.notify.success(res.data.msg)
+					} else {
+						this.$refs.notify.error(res.data.msg)
+					}
+				}).catch(err => {
+					this.$refs.notify.error('请求异常，请稍候再试')
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	.message{
+		margin-top: 30rpx;
+		padding: 20rpx;
+		background-color: #eeeeef;
+		border-radius: 10rpx;
+	}
+	.message-text{
+		font-size: 30rpx;
+		font-weight:bold;
+	}
+	
+	.message-bottom{
+		flex-flow: row nowrap;
+		justify-content: space-between;
+		margin-top: 8rpx;
+	}
+	.phone-bottom{
+		margin-top: 10rpx;
+	}
+	.phone{
+		background-color: #e7e7e8;
+		padding: 30rpx;
+	}
+</style>
