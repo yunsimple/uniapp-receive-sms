@@ -1,0 +1,49 @@
+<template>
+	<view class="content">
+		<view class="avatar">
+			<u-row justify="center">
+				<u-icon name="fingerprint" color="#35516B" size="80"></u-icon>
+			</u-row>
+		</view>
+		<view class="user">
+			<view class="user-info">
+				<u--text color="#B2B2B2" size="14" text="登陆邮箱"></u--text>
+			</view>
+			<u--input :focus="true" maxlength="32" confirmType="next" placeholder="请输入邮箱" border="bottom" clearable></u--input>
+			
+			<view class="user-info" style="margin-top: 20rpx;">
+				<u--text color="#B2B2B2" size="14" text="密码"></u--text>
+			</view>
+			<u--input maxlength="32" placeholder="请输入密码" border="bottom" clearable password></u--input>
+		</view>
+		<u-button class="login" shape="circle" type="primary" text="登 陆"></u-button>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+
+			}
+		},
+		methods: {
+
+		}
+	}
+</script>
+
+<style>
+	.avatar{
+		margin-top: 150rpx;
+	}
+	.user{
+		margin-top: 80rpx;
+	}
+	.user-info{
+		margin-left: 20rpx;
+	}
+	.login{
+		margin-top: 80rpx;
+	}
+</style>

@@ -6,6 +6,7 @@ import {
 	firstRequest,
 	getAccessToken
 } from "@/utils/token.js"
+//js-base64，不兼容vue
 import {
 	encode
 } from 'js-base64'
@@ -25,8 +26,8 @@ function Authorization(access_token) {
 
 //请求拦截器之前
 http.interceptors.request.use(async (config) => {
-	console.log('拦截前')
-	console.log(config)
+	//console.log('拦截前')
+	//console.log(config)
 	uni.showLoading({
 	    title: '加载中'
 	});

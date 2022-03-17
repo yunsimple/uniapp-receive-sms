@@ -1,6 +1,9 @@
 <template>
 	<view>
 		<z-paging class="content" ref="paging" v-model="dataList" @query="queryList">
+			<cell>
+				<u-my-notice></u-my-notice>
+			</cell>
 			<cell v-for="(item,index) in dataList">
 				<u-my-phone :item="item"></u-my-phone>
 			</cell>
@@ -21,7 +24,6 @@
 		},
 		methods: {
 			queryList(pageNo, pageSize) {
-				console.log(pageNo, pageSize)
 				http.post('/phone', {
 					page: pageNo
 				}).then(res => {

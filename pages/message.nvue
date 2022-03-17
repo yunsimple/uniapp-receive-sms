@@ -2,9 +2,10 @@
 	<view>
 		<z-paging ref="paging" v-model="dataList" @query="queryList">
 			<cell>
+				<u-my-notice></u-my-notice>
 				<view class="phone">
 					<view class="phone-top" style="flex-flow:row nowrap;justify-content: center;">
-						<view class="phone-top-image">
+						<view class="phone-top-image" @click="countryList">
 							<u--image :src="imageUrl(bh)" width="96rpx" height="96rpx"></u--image>
 						</view>
 						<view class="phone-top-text" style="flex-flow:row nowrap;">
@@ -65,12 +66,19 @@
 			return {
 				dataList: [],
 				phone_num: null,
-				bh: null
+				bh: null,
+				country_id: null,
+				country_title: null
 			}
 		},
 		onLoad(e) {
 			this.phone_num = e.phone_num
 			this.bh = e.bh
+			this.country_id = e.country_id
+			this.country_title = e.country_title
+			uni.setNavigationBarTitle({
+				title: e.phone_num
+			})
 		},
 		methods: {
 			//生成国旗图片方法
@@ -189,6 +197,18 @@
 				}).catch(err => {
 					this.$refs.notify.error('请求异常，请稍候再试')
 				})
+			},
+			countryList: function(e) { //点击事件
+				uni.navigateTo({
+					url: 'phone-category?type=countryList&id=' + this.country_id + '&country=' + this.country_title,
+					success(e) {
+						//todo
+					},
+					fail(e) {
+						console.log(e)
+						this.$refs.notify.error('跳转页面失败，请稍候再试')
+					}
+				})
 			}
 		}
 	}
@@ -216,6 +236,6 @@
 	}
 	.phone{
 		background-color: #e7e7e8;
-		padding: 30rpx;
+		padding: 100rpx 0;
 	}
 </style>

@@ -2,7 +2,8 @@
 	<view>
 		<z-paging class="content" ref="paging" v-model="dataList" @query="queryList">
 			<cell class="country-list">
-				<view style="margin-top: 30rpx;" v-for="(item,index) in dataList" class="country-list-image" :data-id="item.id" :data-country="item.title" @click="click">
+				<view style="margin-top: 30rpx;" v-for="(item,index) in dataList" class="country-list-image"
+					:data-id="item.id" :data-country="item.title" @click="click">
 					<image :src="imageUrl(item.bh)" style="height: 200rpx;" mode="heightFix"></image>
 					<text class="country-list-title-text">{{item.title}}</text>
 				</view>
@@ -15,7 +16,9 @@
 	import {
 		http
 	} from '@/utils/request.js'
-	import { appParams } from '@/utils/config.js'
+	import {
+		appParams
+	} from '@/utils/config.js'
 	var page
 	export default {
 		data() {
@@ -63,12 +66,12 @@
 					this.$refs.notify.error('请求失败，请稍候再试')
 					this.dataList = []
 					let countryCacheData = uni.getStorageSync('countryCacheData')
-					if(countryCacheData && uni.getStorageSync(appParams).cache){
+					if (countryCacheData && uni.getStorageSync(appParams).cache) {
 						this.$refs.paging.complete(countryCacheData);
-					}else{
+					} else {
 						this.$refs.paging.complete(false);
 					}
-					
+
 				})
 			},
 			click: function(e) { //点击事件

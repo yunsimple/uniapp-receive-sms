@@ -1,0 +1,373 @@
+<template>
+	<view>
+		<z-paging class="content" ref="paging" v-model="emailList" @query="queryList" :refresher-only="true">
+			<cell class="email">
+				<view class="email-address">
+					<u--text :type="emailColor" :bold="true" size="20" align="center" :text="emailUser + site[siteCurrent]">
+					</u--text>
+				</view>
+				<view style="margin:30rpx 0 5rpx 0">
+					<u-loadmore status="nomore" :line="true" nomoreText="邮箱操作" />
+				</view>
+				<view class="email-input">
+					<u-row justify="center">
+						<u-col span="6">
+							<u--input color="#c6c6c6" v-model="emailUser" placeholder="输入邮箱名" border="bottom"
+								:disabled="inputDisabled" inputAlign="right"></u--input>
+						</u-col>
+						<u-col span="6" class="picker-box">
+							<picker @change="selectConfirm" :value="siteCurrent" :range="site" :disabled="pickerDisabled">
+								<view class="picker">
+									<view><u--text size="16" color="#A9A9A9" :text="site[siteCurrent]"></u--text></view>
+									<view style="margin-top: 8rpx;"><u-icon color="#A9A9A9" name="arrow-down"></u-icon></view>
+								</view>
+							</picker>
+						</u-col>
+					</u-row>
+				</view>
+				<view class="email-button">
+					<u-row justify="center" gutter="2">
+						<u-col span="6">
+							<u-button throttleTime="2000" type="primary" icon="edit-pen" text="指定邮箱" @click="apply">
+							</u-button>
+						</u-col>
+						<u-col span="6">
+							<u-button throttleTime="2000" type="primary" icon="grid" text="随机邮箱"
+								@click="apply('random')"></u-button>
+						</u-col>
+					</u-row>
+					<u-row justify="center" gutter="2" style="margin-top: 10rpx;">
+						<u-col span="6">
+							<u-button throttleTime="2000" type="success" icon="email" text="接收邮件" @click="getEmail">
+							</u-button>
+						</u-col>
+						<u-col span="6">
+							<u-button throttleTime="2000" type="error" icon="trash" text="销毁邮箱" @click="del"></u-button>
+						</u-col>
+					</u-row>
+				</view>
+
+				<view style="margin:30rpx 0 5rpx 0">
+					<u-loadmore status="nomore" :line="true" nomoreText="邮件列表" />
+				</view>
+
+				<view class="email-list">
+					
+					<view v-if="emailList.length > 0">
+						<view class="my-table-head">
+							<u-row justify="center">
+								<u-col span="3">
+									<view class="my-table-shape my-table-head-title">
+										<u--text text="发件人"></u--text>
+									</view>
+								</u-col>
+								<u-col span="6">
+									<view class="my-table-shape my-table-head-title">
+										<u--text text="主题"></u--text>
+									</view>
+								</u-col>
+								<u-col span="3">
+									<view class="my-table-shape my-table-head-title">
+										<u--text text="时间"></u--text>
+									</view>
+								</u-col>
+							</u-row>
+						</view>
+						<view v-for="(item, index) in emailList" :key="index" :data-id="index" @click="emailDetail">
+							<!-- 有数据 -->
+							<u-row justify="center">
+								<u-col span="3">
+									<u--text class="my-table-shape my-table-content" style="border-right:0;" :lines="1"
+										:text="item['from']"></u--text>
+								</u-col>
+								<u-col span="6">
+									<u--text class="my-table-shape my-table-content"
+										style="border-right:0;border-left:0;" :lines="1" :text="item['subject']">
+									</u--text>
+								</u-col>
+								<u-col span="3">
+									<u--text class="my-table-shape my-table-content" style="border-left:0rpx;"
+										:lines="1" :text="toDate(item['time'])"></u--text>
+								</u-col>
+							</u-row>
+						</view>
+					</view>
+					<view v-else>
+						<!-- 空 -->
+						<u-empty mode="data" icon="http://cdn.uviewui.com/uview/empty/data.png">
+						</u-empty>
+					</view>
+				</view>
+			</cell>
+		</z-paging>
+		<u-notify ref="notify"></u-notify>
+		<u-modal :show="modalShow" @cancel="close" @confirm="deleteEmailUser" ref="uModal" :asyncClose="true"
+			content="销毁后将永久删除，无法找回？" :showCancelButton="true"></u-modal>
+	</view>
+</template>
+<script>
+	import {
+		http
+	} from '@/utils/request.js'
+	import clipboard from "@/js_sdk/dc-clipboard/clipboard.js"
+	import {
+		toDate
+	} from "@/utils/tools.js"
+	export default {
+		data() {
+			return {
+				email: '', //申请成功的邮箱
+				emailUser: '',
+				emailColor: 'primary',
+				inputDisabled: false, //input禁止状态,
+				emailList: [],
+				emailNumber: 0,
+				click: 0,
+				site: [],
+				siteCurrent: 0,
+				modalShow: false,
+				popupShow: false,
+/* 				emailList: [{
+					"time": 1647505376,
+					"subject": "筚路蓝缕 以启山林",
+					"body": "筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林\r\n",
+					"html": "<div>筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林<br /></div>\r\n",
+					"from": "深蓝 <zpinsist@gmail.com>",
+					"to": "<xaizo3055@1655mail.com>",
+					"attachments": [],
+					"path": "/www/vmail/1655mail.com/xaizo3055/cur/1647505388.M86032P27747.mail.mytempsms.com,S=3434,W=3496"
+				},{
+					"time": 1647505376,
+					"subject": "筚路蓝缕 以启山林",
+					"body": "筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林 筚路蓝缕 以启山林\r\n",
+					"html": "<div>筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林\r\n\r\n筚路蓝缕 以启山林<br /></div>\r\n",
+					"from": "深蓝 <zpinsist@gmail.com>",
+					"to": "<xaizo3055@1655mail.com>",
+					"attachments": [],
+					"path": "/www/vmail/1655mail.com/xaizo3055/cur/1647505388.M86032P27747.mail.mytempsms.com,S=3434,W=3496"
+				}] */
+			}
+		},
+		onLoad() {
+			this.getEmailSite()
+			//this.site[0] = ["@1655mail.com", "@mailscode.com", "@bestemail.online"]
+		},
+		methods: {
+			queryList() {
+				this.getEmail()
+			},
+			getEmail() { //获取邮件
+				this.click++
+				if (this.click < 2) {
+					this.$refs.paging.complete(this.emailList);
+					return
+				}
+				if (!this.email) {
+					this.$refs.notify.warning('请先申请邮箱')
+					this.$refs.paging.complete(this.emailList);
+					return
+				}
+				http.post('/email_get', {
+					email: this.email
+				}, {
+					custom: {
+						//auth: true
+					}
+				}).then(res => {
+					console.log(res)
+					console.log(this.emailList.length)
+					let error_code = res.data.error_code
+					if (error_code === 3000) {
+						//服务器暂时未收到邮件
+						this.$refs.notify.info(res.data.msg)
+						this.$refs.paging.complete(this.emailList);
+						return
+					} else if (error_code === 4000) {
+						//获取邮件时出现错误
+						this.$refs.notify.error('请求邮件失败，请稍候再试')
+						this.$refs.paging.complete(this.emailList);
+						return
+					} else if (error_code === 0) {
+						//成功请求到邮件
+						//比对当前邮件数量是否新增
+						let emailData = res.data.data
+						let emailDataNumber = emailData.length
+						this.$refs.paging.complete(emailData);
+						console.log(emailData)
+						if (this.emailNumber < emailDataNumber) {
+							this.$refs.notify.success(res.data.msg)
+							this.emailNumber = emailDataNumber + this.emailNumber
+						} else {
+							this.$refs.notify.info('还未收到新邮件')
+						}
+					}
+				}).catch(err => {
+					this.$refs.notify.error('请求失败，请稍候再试')
+					this.$refs.paging.complete(this.emailList);
+				})
+			},
+			getEmailSite() {
+				http.post('/email_site', {}, {
+					custom: {
+						// auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code !== 0) {
+						this.$refs.notify.error(res.data.msg)
+						return
+					}
+					this.site = res.data.data;
+				}).catch(err => {
+					this.$refs.notify.error('请求失败，请稍候再试')
+					return false
+				})
+			},
+			apply(type) {
+				//如果不存在site,申请时需要获取
+				if (this.site.length == 0) {
+					console.log('重新获取email site')
+					this.getEmailSite()
+				}
+				if (type === 'random') {
+					if (this.email) {
+						this.$refs.notify.warning('邮箱正在使用中，如需更换，请先销毁')
+						return
+					}
+				} else {
+					if (this.email) {
+						this.$refs.notify.warning('邮箱正在使用中，如需更换，请先销毁')
+						return
+					}
+					if (!this.emailUser) {
+						this.$refs.notify.warning('指定邮箱申请，请先输入用户名')
+						return
+					}
+					let emailUserLength = this.emailUser.length
+					if (emailUserLength > 12) {
+						this.$refs.notify.warning('邮箱用户名不能超过12位字符或数字')
+						return
+					}
+					if (emailUserLength < 5) {
+						this.$refs.notify.warning('邮箱用户名不能少于5位字符或数字')
+						return
+					}
+				}
+				//请求邮箱
+				http.post('/email_apply', {
+					email_name: this.emailUser,
+					site: this.site[this.siteCurrent]
+				}, {
+					custom: {
+						//auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code !== 0) {
+						this.$refs.notify.error(res.data.data.msg)
+						return
+					}
+					let data = res.data.data
+					this.$refs.notify.success(data + res.data.msg)
+					this.email = data
+					this.emailUser = data.split('@')[0]
+					//申请成功后，输入框禁止，邮箱颜色变绿
+					this.emailColor = 'success'
+					this.inputDisabled = true
+				}).catch(err => {
+					console.log(err)
+					this.$refs.notify.error('请求失败，请稍候再试')
+				})
+			},
+			copy: function(e) { //点击号码复制
+				e.stopPropagation(); //阻止冒泡
+				clipboard.setText(this.email)
+				this.$refs.notify.info('复制邮箱 ' + this.email + ' 成功', 'info')
+			},
+			del() {
+				this.modalShow = true
+			},
+			deleteEmailUser() { //销毁邮箱
+				if (!this.email) {
+					this.modalShow = false
+					this.$refs.notify.error('当前没有正在使用的邮箱')
+					return
+				}
+				http.post('/email_user_delete', {
+					email: this.email
+				}, {
+					custom: {
+						//auth: true
+					}
+				}).then(res => {
+					if (res.data.error_code !== 0) {
+						this.$refs.notify.error(res.data.msg)
+						return
+					}
+					this.modalShow = false
+					this.$refs.notify.success('邮箱销毁成功')
+					this.email = ''
+					this.emailUser = ''
+					this.emailList = []
+					this.inputDisabled = false
+					this.emailColor = 'primary'
+				}).catch(err => {
+					this.$refs.notify.error('请求失败，请稍候再试')
+				})
+			},
+			close() {
+				this.modalShow = false
+			},
+			confirm() {
+				//this.deleteEmailUser()
+			},
+			toDate(timestamp) { //转换时间
+				return toDate(timestamp)
+			},
+			emailDetail(e) { //跳转到邮件详情页
+				let id = e.currentTarget.attr.dataId
+				uni.navigateTo({
+					url: 'email-detail?emailData=' + encodeURIComponent(JSON.stringify(this.emailList[id]))
+				})
+			},
+			selectConfirm: function(e) {
+				console.log(e)
+				if (this.email) {
+					this.$refs.notify.error('邮箱正在使用中，如需更换，请先销毁')
+					return
+				}
+				this.siteCurrent = e.detail.value
+			}
+		}
+	}
+</script>
+<style>
+	.email-address {
+		background-color: #F1F2F3;
+		border-radius: 10rpx;
+		margin-top: 30rpx;
+		height: 100rpx;
+	}
+
+	.email-button {
+		margin-top: 20rpx;
+	}
+
+	.my-table-shape {
+		height: 90rpx;
+		align-items: center;
+		border: 1rpx solid #E3E3E3;
+		padding: 10rpx;
+	}
+
+	.my-table-head-title {
+		background-color: #EFEFEF;
+	}
+
+	.my-table-content {
+		height: 120rpx;
+	}
+	.picker{
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content:space-between;
+	}
+</style>

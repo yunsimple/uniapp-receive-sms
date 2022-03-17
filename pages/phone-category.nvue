@@ -22,8 +22,6 @@
 			}
 		},
 		onLoad(e) {
-			console.log('phone-category接收数据')
-			console.log(e)
 			let type = e.type
 			let navTitle
 			if(type == 'countryList'){
@@ -31,7 +29,6 @@
 				navTitle = e.country + '号码'
 			}else{
 				//type=level 差别显示，有权限才可以查看
-				console.log(e)
 				this.urlValue = e
 				navTitle = '号码'
 			}

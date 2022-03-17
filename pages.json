@@ -17,7 +17,7 @@
 		}, {
 			"path": "pages/email",
 			"style": {
-				"navigationBarTitleText": "全部号码",
+				"navigationBarTitleText": "临时/匿名邮箱",
 				"navigationBarBackgroundColor": "#35516B",
 				"navigationBarTextStyle": "white", //状态栏字体颜色
 				//"navigationStyle": "custom" ,// 隐藏系统导航栏
@@ -27,7 +27,7 @@
 		}, {
 			"path": "pages/country",
 			"style": {
-				"navigationBarTitleText": "全部号码",
+				"navigationBarTitleText": "所有国家",
 				"navigationBarBackgroundColor": "#35516B",
 				"navigationBarTextStyle": "white", //状态栏字体颜色
 				//"navigationStyle": "custom" ,// 隐藏系统导航栏
@@ -37,7 +37,7 @@
 		}, {
 			"path": "pages/message",
 			"style": {
-				"navigationBarTitleText": "全部号码",
+				"navigationBarTitleText": "短信内容",
 				"navigationBarBackgroundColor": "#35516B",
 				"navigationBarTextStyle": "white", //状态栏字体颜色
 				//"navigationStyle": "custom" ,// 隐藏系统导航栏
@@ -66,7 +66,7 @@
 		{
 			"path": "pages/my",
 			"style": {
-				"navigationBarTitleText": "我的",
+				"navigationBarTitleText": "个人中心",
 				"navigationBarBackgroundColor": "#35516B",
 				"navigationBarTextStyle": "white", //状态栏字体颜色
 				"enablePullDownRefresh": false
@@ -75,7 +75,7 @@
 		}, {
 			"path": "pages/login",
 			"style": {
-				"navigationBarTitleText": "登陆",
+				"navigationBarTitleText": "用户登陆",
 				"navigationBarBackgroundColor": "#35516B",
 				"navigationBarTextStyle":"white",  //状态栏字体颜色
 				"enablePullDownRefresh": false

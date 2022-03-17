@@ -1,0 +1,55 @@
+<template>
+	<view class="content">
+		<view class="subject" style="line-height: 100rpx;">
+			<u--text size="25" lines="5" wordWrap="break-word" :bold="true" :text="emailData['subject']"></u--text>
+		</view>
+		<view class="bodys">
+			<view class="info">
+				<u--text :text="'Time：' + toDate(emailData['time'])"></u--text>
+				<u--text :text="'To：' + emailData['to']"></u--text>
+				<u--text :text="'From：' + emailData['from']"></u--text>
+			</view>
+			<view class="body">
+				<mp-html :content="html" lazy-load selectable />
+			</view>
+		</view>
+	</view>
+</template>
+<script>
+	import {
+		toDate
+	} from "@/utils/tools.js"
+	export default {
+		data() {
+			return {
+				subtitle: uni.getStorageSync('app_params').subtitle,
+				emailData: [],
+				html: "",
+			}
+		},
+		onLoad(e) {
+			let emailData = JSON.parse(decodeURIComponent(e.emailData))
+			this.emailData = emailData
+			this.html = emailData.html
+			uni.setNavigationBarTitle({
+				title: emailData.subject
+			})
+		},
+		methods: {
+			toDate(timestamp) { //转换时间
+				return toDate(timestamp)
+			},
+		}
+	}
+</script>
+<style>
+	.subject{
+		margin-top: 30rpx;
+	}
+	.bodys{
+		margin-top: 50rpx;
+	}
+	.body{
+		margin-top: 30rpx;
+	}
+</style>

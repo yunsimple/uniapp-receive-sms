@@ -1,0 +1,79 @@
+<template>
+	<view class="content" :style="{height:height}">
+		<view class="top">
+			<u-my-notice></u-my-notice>
+			<u-my-user ref="myUser"></u-my-user>
+			<view class="box setting" style="margin-top: 50rpx;">
+				<u-cell-group :border="false">
+					<u-cell size="large" icon="../static/images/icon/collect.png" title="收藏号码" :border="false" :clickable="true" isLink></u-cell>
+					<u-cell size="large" icon="../static/images/icon/priority.png" title="优先使用" :border="false" :clickable="true" isLink></u-cell>
+				</u-cell-group>
+			</view>
+			<view class="box system" style="margin-top: 30rpx;">
+				<u-cell-group :border="false">
+					<u-cell size="large" icon="../static/images/icon/language.png" title="语言选择" :border="false" :clickable="true" isLink arrowDirection="down"
+						:value="language[0][languageCurrent]" @click="languageShow = true"></u-cell>
+					<u-cell size="large" icon="../static/images/icon/clear.png" title="清理缓存" :border="false" :clickable="true"></u-cell>
+					<u-cell size="large" icon="../static/images/icon/version.png" title="系统版本" :border="false" :value="version" :clickable="true"></u-cell>
+				</u-cell-group>
+			</view>
+		</view>
+
+		<view class="bottom">
+			<view style="justify-content:center">
+				<u-icon size="15" name="../static/images/icon/out.png"></u-icon>
+			</view>
+			<view>
+				<u--text color="#969696" text=" 退出登陆"></u--text>
+			</view>
+		</view>
+	</view>
+	<u-picker :show="languageShow" :columns="language" @confirm="languageConfirm" @cancel="languageClose" @close="languageClose" ></u-picker>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				version: 'v1.2.5',
+				height: '750px',
+				language: [
+					['中文', 'English']
+				],
+				languageShow: false,
+				languageCurrent: 0
+			}
+		},
+		onLoad() {
+			this.height = uni.getSystemInfoSync().windowHeight
+		},
+		methods: {
+			languageConfirm(e) {
+				this.languageCurrent = e.indexs[0]
+				this.languageShow = false
+			},
+			languageClose(){
+				this.languageShow = false
+			}
+		}
+	}
+</script>
+
+<style>
+	.box {
+		background-color: #F1F2F3;
+		border-radius: 10rpx;
+	}
+
+	.bottom {
+		height: 80rpx;
+		flex-flow: row nowrap;
+		justify-content: center;
+	}
+
+	.content {
+		flex-direction: column;
+		justify-content: space-between;
+		font-weight: bold;
+	}
+</style>
