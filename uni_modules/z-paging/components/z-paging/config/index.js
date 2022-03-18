@@ -5,8 +5,10 @@ module.exports = {
 	'default-page-size': '10',
 	//配置空数据图默认描述文字为：
 	'empty-view-text': '没有找到数据...',
-	//空数据显示图片
-	//'empty-view-img':'../static/images/empty.png'
 	//z-paging是否自动高度时，附加的高度，注意添加单位px或rpx，默认为px，若需要减少高度，请传负数
 	'auto-height-addition': '-20px',
+	//空数据
+	'empty-view-img-style': {width:'400rpx',height:'400rpx'},
+	'empty-view-img': '../static/images/icon/data.png',
+	
 }

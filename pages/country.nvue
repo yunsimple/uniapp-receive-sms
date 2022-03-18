@@ -1,6 +1,9 @@
 <template>
 	<view>
 		<z-paging class="content" ref="paging" v-model="dataList" @query="queryList">
+			<cell>
+				<u-my-notice></u-my-notice>
+			</cell>
 			<cell class="country-list">
 				<view style="margin-top: 30rpx;" v-for="(item,index) in dataList" class="country-list-image"
 					:data-id="item.id" :data-country="item.title" @click="click">

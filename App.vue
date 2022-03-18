@@ -1,13 +1,18 @@
 <script>
+	import aCache from '@/js_sdk/shezw-aCache/shezw-aCache/shezw-aCache.js'
+	Vue.use(aCache,'rsapp', 500 )
 	export default {
+		globalData: {
+			aCache: aCache,
+		},
 		onLaunch: function() {
-			console.log('App Launch')
+			//console.log('App Launch')
 		},
 		onShow: function() {
-			console.log('App Show')
+			//console.log('App Show')
 		},
 		onHide: function() {
-			console.log('App Hide')
+			//console.log('App Hide')
 		}
 	}
 </script>

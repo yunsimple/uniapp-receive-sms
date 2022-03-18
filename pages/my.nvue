@@ -5,8 +5,8 @@
 			<u-my-user ref="myUser"></u-my-user>
 			<view class="box setting" style="margin-top: 50rpx;">
 				<u-cell-group :border="false">
-					<u-cell size="large" icon="../static/images/icon/collect.png" title="收藏号码" :border="false" :clickable="true" isLink></u-cell>
-					<u-cell size="large" icon="../static/images/icon/priority.png" title="优先使用" :border="false" :clickable="true" isLink></u-cell>
+					<u-cell size="large" icon="../static/images/icon/collect.png" title="收藏号码" :border="false" :clickable="true" isLink ></u-cell>
+					<u-cell size="large" icon="../static/images/icon/priority.png" title="优先使用" :border="false" :clickable="true" isLink ></u-cell>
 				</u-cell-group>
 			</view>
 			<view class="box system" style="margin-top: 30rpx;">
@@ -15,6 +15,7 @@
 						:value="language[0][languageCurrent]" @click="languageShow = true"></u-cell>
 					<u-cell size="large" icon="../static/images/icon/clear.png" title="清理缓存" :border="false" :clickable="true"></u-cell>
 					<u-cell size="large" icon="../static/images/icon/version.png" title="系统版本" :border="false" :value="version" :clickable="true"></u-cell>
+					<u-cell size="large" icon="../static/images/icon/version.png" title="test" :border="false" :value="version" :clickable="true" @click="test"></u-cell>
 				</u-cell-group>
 			</view>
 		</view>
@@ -32,6 +33,7 @@
 </template>
 
 <script>
+	var aCache = getApp().globalData.aCache
 	export default {
 		data() {
 			return {
@@ -46,6 +48,7 @@
 		},
 		onLoad() {
 			this.height = uni.getSystemInfoSync().windowHeight
+			
 		},
 		methods: {
 			languageConfirm(e) {
@@ -54,6 +57,14 @@
 			},
 			languageClose(){
 				this.languageShow = false
+			},
+			test(){
+				uni.navigateTo({
+					url: 'test',
+					success(e) {
+						//todo
+					}
+				})
 			}
 		}
 	}

@@ -5,15 +5,16 @@ import Vue from 'vue'
 Vue.config.productionTip = false
 App.mpType = 'app'
 
+const app = new Vue({
+    ...App
+})
+
 import uView from 'uview-ui';
 Vue.use(uView);
 
 //导入z-paging全局配置
 import zConfig from '@/uni_modules/z-paging/components/z-paging/js/z-paging-config'
 
-const app = new Vue({
-    ...App
-})
 app.$mount()
 // #endif
 

@@ -1,6 +1,9 @@
 <template>
 	<view>
 		<z-paging class="content" ref="paging" v-model="emailList" @query="queryList" :refresher-only="true">
+			<cell>
+				<u-my-notice></u-my-notice>
+			</cell>
 			<cell class="email">
 				<view class="email-address">
 					<u--text :type="emailColor" :bold="true" size="20" align="center" :text="emailUser + site[siteCurrent]">
@@ -94,7 +97,7 @@
 					</view>
 					<view v-else>
 						<!-- 空 -->
-						<u-empty mode="data" icon="http://cdn.uviewui.com/uview/empty/data.png">
+						<u-empty mode="data" text="邮件列表为空" icon="http://cdn.uviewui.com/uview/empty/data.png">
 						</u-empty>
 					</view>
 				</view>

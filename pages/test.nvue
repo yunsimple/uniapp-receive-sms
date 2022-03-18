@@ -1,0 +1,66 @@
+<template>
+	<view>
+		
+	</view>
+</template>
+
+<script>
+	var aCache = getApp().globalData.aCache
+	export default {
+		data() {
+			return {
+				
+			}
+		},
+		onLoad() {
+			
+/* 			let arr = [11,22,33,22,55]
+			let set = new Set(arr);
+			set.forEach((value)=>{
+							console.log(value)
+						}) */
+ 			//uni.removeStorageSync('noticeClose')
+			aCache.remove('noticeList')
+			console.log(uni.getStorageSync('noticeClose'))
+			console.log(aCache.get('noticeList')) 
+/* 			let notice = aCache.get('noticeList')
+			for(let key in notice){
+				console.log(notice[key])
+			} */
+			//let set = new Set([11,22,33,22,55,44]);
+			//let arr = Array.from(set)
+			//console.log(arr)
+/* 			set.forEach((value)=>{
+				console.log(value)
+			})
+			uni.setStorageSync('notice', {text:'111'})
+			console.log(uni.getStorageSync('notice')) */
+/* 			uni.removeStorageSync('noticeClose')
+			aCache.remove('noticeList') */
+/* 			let a = [];
+			console.log(a)
+			let b = {age:18}
+			let c = {age:30}
+			a[0] = b
+			a[1] = c
+			console.log(a) */
+ 			/* let test = uni.getStorageSync('test')
+			if(test){
+				test.push(1231111)
+				
+			}else{
+				test = [1] 
+			}
+			uni.setStorageSync('test', test)
+			console.log(uni.getStorageSync('test')) */
+			
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style>
+
+</style>
