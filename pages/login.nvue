@@ -5,45 +5,229 @@
 				<u-icon name="fingerprint" color="#35516B" size="80"></u-icon>
 			</u-row>
 		</view>
-		<view class="user">
-			<view class="user-info">
-				<u--text color="#B2B2B2" size="14" text="登陆邮箱"></u--text>
+		<u--form labelPosition="left" :model="model1" ref="form1" :rules="rules">
+			<view class="user">
+				<view class="user-info">
+					<u--text :bold="true" color="#8c8c8c" size="14" text="用户邮箱"></u--text>
+				</view>
+				<u-form-item prop="userInfo.email" ref="item1">
+					<u--input maxlength="32" confirmType="next" placeholder="请输入邮箱" border="bottom"
+						clearable v-model="model1.userInfo.email"></u--input>
+				</u-form-item>
+
+				<view class="user-info" style="margin-top: 20rpx;">
+					<u--text :bold="true" color="#8c8c8c" size="14" text="密码"></u--text>
+				</view>
+				<u-form-item prop="userInfo.password" ref="item1">
+					<u--input maxlength="32" placeholder="请输入密码" border="bottom" clearable password v-model="model1.userInfo.password"></u--input>
+				</u-form-item>
+
+				<view v-if="currentType === 1">
+					<view class="user-info" style="margin-top: 20rpx;">
+						<u--text :bold="true" color="#8c8c8c" size="14" text="确认密码"></u--text>
+					</view>
+					<u-form-item prop="userInfo.password2" ref="item1">
+						<u--input maxlength="32" placeholder="请输入确认密码" border="bottom" clearable password v-model="model1.userInfo.password2"></u--input>
+					</u-form-item>
+				</view>
+
+
+				<view class="forget">
+					<view class="">
+						<u--text size="12" color="#adadad" text="忘记密码" @click="forgetPwd"></u--text>
+					</view>
+					<view class="">
+						<u--text size="12" color="#adadad" :text="type[currentType][2]" @click="click"></u--text>
+					</view>
+
+				</view>
+
 			</view>
-			<u--input :focus="true" maxlength="32" confirmType="next" placeholder="请输入邮箱" border="bottom" clearable></u--input>
-			
-			<view class="user-info" style="margin-top: 20rpx;">
-				<u--text color="#B2B2B2" size="14" text="密码"></u--text>
-			</view>
-			<u--input maxlength="32" placeholder="请输入密码" border="bottom" clearable password></u--input>
-		</view>
-		<u-button class="login" shape="circle" type="primary" text="登 陆"></u-button>
+		</u--form>
+		<u-button class="login" shape="circle" type="primary" :text="type[currentType][1]" @click="login"></u-button>
+		<u-notify ref="notify"></u-notify>
 	</view>
 </template>
 
 <script>
+	import {
+		http
+	} from '@/utils/request.js'
+	import md5 from 'js-md5'
+	import {
+		encode,
+		decode
+	} from 'js-base64'
+	import {
+		appParams
+	} from '@/utils/config.js'
+	var graceChecker = require("@/utils/checker.js");
 	export default {
 		data() {
 			return {
-
+				currentType: 0,
+				types: 'register',
+				type: [
+					['login', '登 陆', '注册用户'],
+					['register', '注 册', '用户登陆']
+				],
+				model1: {
+					userInfo: {
+						email: null,
+						password: null,
+						password2: null
+					}
+				},
+				rules: {
+					'userInfo.email': [
+						{
+							type: 'email',
+							required: true,
+							message: '请输入正确的emal',
+							trigger: ['change']
+						},
+						{
+							min: 5,
+							message: '邮箱地址过短',
+							trigger: ['change']
+						},
+						{
+							max: 32,
+							message: '邮箱地址过长',
+							trigger: ['change']
+						}
+					],
+					'userInfo.password': [
+						{
+							type: 'string',
+							required: true,
+							message: '请输入正确的密码',
+							trigger: ['blue']
+						},
+						{
+							min: 8,
+							message: '密码过短',
+							trigger: ['change']
+						},
+						{
+							max: 32,
+							message: '密码过长',
+							trigger: ['change']
+						}
+					],
+					'userInfo.password2': [
+						{
+							validator: (rule, value, callback) => {
+								if(this.model1.userInfo.password !== value){
+									return false
+								}
+								return true
+							},
+							type: 'string',
+							required: true,
+							message: '重复密码不一致',
+							trigger: ['change'],
+						}
+					]
+				}
 			}
 		},
 		methods: {
+			forgetPwd: function() {
+				//uni.removeStorageSync('username')
+			},
+			click: function() {
+				if (this.currentType === 0) {
+					this.currentType = 1
+				} else {
+					this.currentType = 0
+				}
+			},
+			login: function(){
+				// 如果有错误，会在catch中返回报错信息数组，校验通过则在then中返回true
+				this.$refs.form1.validate().then(res => {
+					uni.$u.toast('校验通过')
+				}).catch(errors => {
+					return false
+				})
+			},
+			submit: function(e) {
+				var formData = e.detail.value
+				if (formData.password2) { //判断是注册还是登陆 登陆
+					http.post('/register', { //注册
+						username: formData.username,
+						password: formData.password
+					}, {
+						custom: {
+							auth: true
+						}
+					}).then(res => {
+						if (res.data.error_code === 0) {
+							this.$refs.message.open(formData.username + "注册成功")
+							this.currentType = 0
+						} else {
+							this.$refs.message.open(res.data.msg, 'error')
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$refs.message.open(formData.username + "注册失败", 'error')
+					})
 
+				} else { //登陆
+					http.post('/login', { //登陆
+						username: formData.username,
+						password: formData.password
+					}, {
+						custom: {
+							auth: true
+						}
+					}).then(res => {
+						console.log(res)
+						if (res.data.error_code === 0) {
+							this.$refs.message.open(formData.username + "登陆成功")
+							uni.setStorageSync('username', formData.username)
+							uni.setStorageSync('access_token', res.data.data.access_token)
+							uni.setStorageSync('refresh_token', res.data.data.refresh_token)
+							uni.switchTab({
+								url: 'my',
+								fail(err) {
+									console.log(err)
+								}
+							})
+						} else {
+							this.$refs.message.open(res.data.msg, 'error')
+						}
+					}).catch(err => {
+						console.log(err)
+						this.$refs.message.open(formData.username + "登陆失败", 'error')
+					})
+
+				}
+			}
 		}
 	}
 </script>
 
 <style>
-	.avatar{
+	.avatar {
 		margin-top: 150rpx;
 	}
-	.user{
+
+	.user {
 		margin-top: 80rpx;
 	}
-	.user-info{
+
+	.user-info {
 		margin-left: 20rpx;
 	}
-	.login{
+
+	.login {
 		margin-top: 80rpx;
+	}
+
+	.forget {
+		margin-top: 10rpx;
+		flex-flow: row nowrap;
+		justify-content: space-between;
 	}
 </style>
